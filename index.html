@@ -86,6 +86,15 @@
     justify-content: center;
     max-width: 90vw; /* never exceed viewport width */
   }
+
+  /* Desktop: keep the loader name on a single line */
+  @media (min-width: 769px) {
+    #loader-text {
+      flex-wrap: nowrap;      /* prevent wrapping on desktop */
+      white-space: nowrap;    /* keep letters in one continuous line */
+      max-width: 95vw;       /* allow more room on large screens */
+    }
+  }
   #loader-text span { display: inline-block; transform: translateY(110%); animation: slideUp 0.7s cubic-bezier(.76,0,.24,1) forwards; }
   #loader-text span:nth-child(1){animation-delay:0.1s}
   #loader-text span:nth-child(2){animation-delay:0.16s}
@@ -112,6 +121,7 @@
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     width: 100%;
     padding: 18px 24px; display: flex; justify-content: flex-start; align-items: center;
+    flex-wrap: nowrap; /* keep logo + links on a single line */
     box-sizing: border-box;
     min-height: 64px; /* prevent nav from collapsing on some devices */
     mix-blend-mode: difference;
@@ -134,6 +144,8 @@
     gap: 32px;
     margin-left: auto;
     justify-content: flex-end;
+    flex-wrap: nowrap;    /* prevent the link group from wrapping */
+    white-space: nowrap;  /* ensure individual links don't break onto multiple lines */
   }
   .nav-links a {
     font-size: 0.8rem; color: var(--fg); text-decoration: none;
