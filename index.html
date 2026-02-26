@@ -16,6 +16,15 @@
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* make all media scale down on smaller viewports
+     this catches any <img> or <video> elements that might be added
+     later and prevents horizontal overflow. */
+  img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
   html { scroll-behavior: smooth; }
 
   body {
@@ -24,8 +33,9 @@
     font-family: 'DM Sans', sans-serif;
     overflow-x: hidden;
     cursor: none;
-    max-width: 1440px;
-    margin: 0 auto;
+    width: 100vw;               /* full viewport width, not larger */
+    margin: 0;
+    padding: 0;
   }
 
   /* ─── CUSTOM CURSOR ─── */
@@ -91,17 +101,22 @@
 
   /* ─── NAV ─── */
   nav {
-    position: fixed; top: 0; left: 50%; z-index: 100;
-    transform: translateX(-50%);
-    width: 100%; max-width: 1440px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    width: 100vw;
     padding: 24px 48px; display: flex; justify-content: space-between; align-items: center;
     mix-blend-mode: difference;
   }
   .nav-logo {
     font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;
     color: var(--fg); text-decoration: none; letter-spacing: -0.02em;
+    position: relative;
+    margin-left: 0; /* remain in flex flow */
+    order: 1;
+    display: block;
+    flex: 0 0 auto;
   }
   .nav-links { display: flex; gap: 32px; }
+  .nav-links { flex: 1 1 auto; justify-content: center; }
   .nav-links a {
     font-size: 0.8rem; color: var(--fg); text-decoration: none;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -639,11 +654,20 @@
     nav { padding: 20px 36px; }
 
     #hero {
-      grid-template-columns: 1fr 300px;
-      padding: 0 36px 56px;
+      /* keep text area only as wide as needed, avoid huge gaps on wider tablets */
+      display: grid;
+      grid-template-columns: auto 300px;
+      justify-content: center;
+      align-items: center;       /* vertically centre on tablets instead of bottom-align */
+      padding: 0 24px 56px;
+      overflow: visible;         /* prevent clipping of heading letters */
     }
     .hero-title { font-size: clamp(2.8rem, 5.5vw, 5.5rem); }
     .hero-desc { max-width: 340px; font-size: 0.95rem; }
+
+     /* limit how wide the left column becomes so content doesn't stretch across
+       the entire screen when there's plenty of space */
+     .hero-left { max-width: 600px; }
 
     #hero-avatar-wrap { width: 280px; height: 360px; margin: 0 auto; }
     .orbit-ring-1 { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
@@ -680,13 +704,16 @@
 
     /* ── HERO: stacked single column ── */
     #hero {
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr auto;
-      height: 100svh;
-      padding: 80px 20px 40px;
+      /* switch to flex for simpler centering on phones */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-items: center;
+      height: 100svh;
+      padding: 80px 20px 40px;   /* restore padding to avoid scroll cutting */
       text-align: center;
+      gap: 16px;
+      overflow: visible;         /* ensure nothing is clipped */
     }
 
     /* Avatar shows above text on mobile — small, centered */
@@ -715,39 +742,78 @@
     /* Left hero content — centered */
     .hero-left {
       width: 100%;
+      max-width: 100%;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      gap: 16px;
       text-align: center;
     }
+
+    /* ensure title text wraps and cannot overflow container */
+    .hero-title,
+    .hero-title .line,
+    .hero-title .line span {
+      max-width: 100%;
+      white-space: normal;
+      /* allow wrap between words only; don't split "Designing" into "Designin" */
+      overflow-wrap: normal;
+      word-break: keep-all;
+    }
+
+    /* keep the hero itself from producing horizontal scroll (and allow
+       vertical overflow for animated lines) */
+    #hero { overflow: visible; }
+    /* let each animated line expand on mobile instead of clipping mid-word */
+    .hero-title .line { overflow: visible; }
     .hero-tag { font-size: 0.65rem; margin-bottom: 14px; }
     .hero-title {
-      font-size: clamp(2.4rem, 11vw, 4rem);
-      line-height: 0.95;
+      font-size: clamp(1.7rem, 7.5vw, 2.6rem);  /* optimized for all mobile sizes */
+      line-height: 1;
       text-align: center;
     }
     .hero-sub {
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 20px;
-      margin-top: 20px;
+      margin-top: 0;
+      max-width: 100%;
+      width: 100%;
     }
     .hero-desc {
       max-width: 100%;
-      font-size: 0.92rem;
+      font-size: 0.85rem;         /* reduced from 0.92rem */
       text-align: center;
+      line-height: 1.6;
     }
     .hero-cta {
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       width: 100%;
+      max-width: 280px;
       gap: 12px;
+      margin: 0 auto;            /* centre the button block */
+      border: none;              /* remove any border */
     }
     .btn-primary {
       display: block;
       text-align: center;
       padding: 16px 24px;
       font-size: 0.9rem;
+      width: 100%;
+      border: none;              /* remove any border */
     }
     .btn-outline {
       justify-content: center;
       font-size: 0.85rem;
+      width: 100%;
+      border: none;              /* remove any border */
     }
     .hero-scroll { display: none; }
 
@@ -851,8 +917,18 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
-    z-index: 200;
+    padding: 8px;
+    z-index: 220;               /* ensure sits above other elements */
+    position: relative;         /* sit in flex flow so justify-content works */
+    margin-right: 0;
+    order: 3;
+    flex: 0 0 auto;
+  }
+
+  /* When nav links are hidden on mobile, make sure hamburger pushes to the right */
+  @media (max-width: 768px) {
+    .nav-hamburger { margin-left: auto; }
+    .nav-logo { margin-left: 8px; }
   }
   .nav-hamburger span {
     display: block;
@@ -910,7 +986,7 @@
   #mobile-menu a:hover::after { width: 100%; }
 
   @media (max-width: 768px) {
-    .nav-hamburger { display: flex; }
+    .nav-hamburger { display: flex; margin-left: auto; }
     #mobile-menu { display: flex; }
   }
 </style>
@@ -1369,23 +1445,23 @@
 <!-- MARQUEE -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <div class="marquee-item">UI Design<span class="dot">✦</span></div>
-    <div class="marquee-item">UX Research<span class="dot">✦</span></div>
-    <div class="marquee-item">Design Systems<span class="dot">✦</span></div>
-    <div class="marquee-item">Prototyping<span class="dot">✦</span></div>
-  
-    <div class="marquee-item">Mobile<span class="dot">✦</span></div>
-    <div class="marquee-item">Web<span class="dot">✦</span></div>
-    <div class="marquee-item">Interactions<span class="dot">✦</span></div>
+    <div class="marquee-item">UI Design <span class="dot">✦</span></div>
+    <div class="marquee-item">UX Research <span class="dot">✦</span></div>
+    <div class="marquee-item">Design Systems <span class="dot">✦</span></div>
+    <div class="marquee-item">Prototyping <span class="dot">✦</span></div>
+    <div class="marquee-item">Figma Expert <span class="dot">✦</span></div>
+    <div class="marquee-item">Mobile UX <span class="dot">✦</span></div>
+    <div class="marquee-item">Web Design <span class="dot">✦</span></div>
+    <div class="marquee-item">Interaction Design <span class="dot">✦</span></div>
     <!-- duplicate for seamless loop -->
-    <div class="marquee-item">UI Design<span class="dot">✦</span></div>
-    <div class="marquee-item">UX Research<span class="dot">✦</span></div>
-    <div class="marquee-item">Design Systems<span class="dot">✦</span></div>
-    <div class="marquee-item">Prototyping<span class="dot">✦</span></div>
-
-    <div class="marquee-item">Mobile<span class="dot">✦</span></div>
-    <div class="marquee-item">Web<span class="dot">✦</span></div>
-    <div class="marquee-item">Interactions<span class="dot">✦</span></div>
+    <div class="marquee-item">UI Design <span class="dot">✦</span></div>
+    <div class="marquee-item">UX Research <span class="dot">✦</span></div>
+    <div class="marquee-item">Design Systems <span class="dot">✦</span></div>
+    <div class="marquee-item">Prototyping <span class="dot">✦</span></div>
+    <div class="marquee-item">Figma Expert <span class="dot">✦</span></div>
+    <div class="marquee-item">Mobile UX <span class="dot">✦</span></div>
+    <div class="marquee-item">Web Design <span class="dot">✦</span></div>
+    <div class="marquee-item">Interaction Design <span class="dot">✦</span></div>
   </div>
 </div>
 
@@ -1563,7 +1639,7 @@
 <section id="contact">
   <p class="contact-pre">Let's create something great</p>
   <h2 class="contact-title">Let's<br>Talk.</h2>
-  <a href="mailto:amanvarma5408@gmail.com" class="contact-email">amanvarma5408@gmail.com</a>
+  <a href="mailto:amanvarma@example.com" class="contact-email">amanvarma@example.com</a>
   <div class="contact-links">
     <a href="https://www.linkedin.com/in/amanvarma-vitrouthu" target="_blank" class="contact-link">LinkedIn</a>
     <a href="https://www.behance.net/" target="_blank" class="contact-link">Behance</a>
