@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aman Varma — UI/UX Designer</title>
 <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -27,13 +27,16 @@
 
   html { scroll-behavior: smooth; }
 
+  /* keep layout from shifting when vertical scrollbar appears */
+  html { scrollbar-gutter: stable; }
+
   body {
     background: var(--bg);
     color: var(--fg);
     font-family: 'DM Sans', sans-serif;
     overflow-x: hidden;
     cursor: none;
-    width: 100vw;               /* full viewport width, not larger */
+    width: 100%;                /* use percent to avoid 100vw scrollbar issues */
     margin: 0;
     padding: 0;
   }
@@ -72,11 +75,16 @@
     position: fixed; inset: 0; background: var(--bg);
     z-index: 9997; display: flex; align-items: center; justify-content: center;
     flex-direction: column; gap: 16px;
+    overflow-x: hidden; /* prevent any child overflow */
   }
   #loader-text {
     font-family: 'Syne', sans-serif; font-size: clamp(3rem, 10vw, 7rem);
     font-weight: 800; color: var(--fg);
     overflow: hidden; display: flex;
+    /* allow the animated letters to wrap if they can't fit on one line */
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90vw; /* never exceed viewport width */
   }
   #loader-text span { display: inline-block; transform: translateY(110%); animation: slideUp 0.7s cubic-bezier(.76,0,.24,1) forwards; }
   #loader-text span:nth-child(1){animation-delay:0.1s}
@@ -102,8 +110,10 @@
   /* ─── NAV ─── */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    width: 100vw;
-    padding: 24px 48px; display: flex; justify-content: space-between; align-items: center;
+    width: 100%;
+    padding: 18px 24px; display: flex; justify-content: flex-start; align-items: center;
+    box-sizing: border-box;
+    min-height: 64px; /* prevent nav from collapsing on some devices */
     mix-blend-mode: difference;
   }
   .nav-logo {
@@ -111,12 +121,20 @@
     color: var(--fg); text-decoration: none; letter-spacing: -0.02em;
     position: relative;
     margin-left: 0; /* remain in flex flow */
-    order: 1;
+    order: 0; /* ensure logo stays first in the flex row */
     display: block;
     flex: 0 0 auto;
+    margin-left: 8px;
+    z-index: 999; /* ensure visible above background*/
   }
-  .nav-links { display: flex; gap: 32px; }
-  .nav-links { flex: 1 1 auto; justify-content: center; }
+  /* push the links to the right edge by giving them auto left margin
+     and align their contents to the end so they're right‑justified. */
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
   .nav-links a {
     font-size: 0.8rem; color: var(--fg); text-decoration: none;
     letter-spacing: 0.1em; text-transform: uppercase;
@@ -702,6 +720,15 @@
     }
     .nav-links { display: none; }
 
+    /* smaller loader text on mobile devices */
+    #loader-text {
+      font-size: clamp(1.2rem, 6vw, 3rem);
+      max-width: 90vw;
+      /* enable wrapping under the mobile breakpoint too */
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
     /* ── HERO: stacked single column ── */
     #hero {
       /* switch to flex for simpler centering on phones */
@@ -919,15 +946,17 @@
     cursor: pointer;
     padding: 8px;
     z-index: 220;               /* ensure sits above other elements */
-    position: relative;         /* sit in flex flow so justify-content works */
-    margin-right: 0;
+    position: absolute;         /* pin inside nav */
+    right: 24px;                /* match nav padding */
+    top: 50%;
+    transform: translateY(-50%);
     order: 3;
     flex: 0 0 auto;
   }
 
   /* When nav links are hidden on mobile, make sure hamburger pushes to the right */
   @media (max-width: 768px) {
-    .nav-hamburger { margin-left: auto; }
+    /* absolute positioning already keeps hamburger at right; logo remains at left */
     .nav-logo { margin-left: 8px; }
   }
   .nav-hamburger span {
@@ -986,7 +1015,7 @@
   #mobile-menu a:hover::after { width: 100%; }
 
   @media (max-width: 768px) {
-    .nav-hamburger { display: flex; margin-left: auto; }
+    .nav-hamburger { display: flex; margin-left: auto; margin-right: 8px; }
     #mobile-menu { display: flex; }
   }
 </style>
@@ -1733,20 +1762,24 @@
     });
   });
 
-  // ─── NAV HIDE ON SCROLL
-  let lastScroll = 0;
-  window.addEventListener('scroll', () => {
-    const nav = document.querySelector('nav');
-    const scrollY = window.scrollY;
-    if (scrollY > lastScroll && scrollY > 100) {
-      nav.style.transform = 'translateX(-50%) translateY(-100%)';
-      nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
-    } else {
-      nav.style.transform = 'translateX(-50%) translateY(0)';
-      nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
-    }
-    lastScroll = scrollY;
-  });
+  // ─── NAV HIDE ON SCROLL (disabled)
+  // The site originally hid the nav when scrolling by translating the element.
+  // That behaviour has been disabled so the navigation remains fixed and stable.
+  // If you later want to re-enable hide-on-scroll, restore the handler below.
+  //
+  // let lastScroll = 0;
+  // window.addEventListener('scroll', () => {
+  //   const nav = document.querySelector('nav');
+  //   const scrollY = window.scrollY;
+  //   if (scrollY > lastScroll && scrollY > 100) {
+  //     nav.style.transform = 'translateX(-50%) translateY(-100%)';
+  //     nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
+  //   } else {
+  //     nav.style.transform = 'translateX(-50%) translateY(0)';
+  //     nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
+  //   }
+  //   lastScroll = scrollY;
+  // });
 </script>
 </body>
 </html>
