@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aman Varma — UI/UX Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --fg: #f0ece4;
+    --accent: #c8f04d;
+    --muted: #333;
+    --mid: #888;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* ─── CUSTOM CURSOR ─── */
+  #cursor {
+    position: fixed; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.08s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+  }
+  #cursor-follower {
+    position: fixed; width: 40px; height: 40px;
+    border: 1px solid rgba(200,240,77,0.4); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.18s ease, width 0.3s, height 0.3s;
+  }
+  body:has(a:hover) #cursor,
+  body:has(button:hover) #cursor { width: 6px; height: 6px; }
+  body:has(a:hover) #cursor-follower,
+  body:has(button:hover) #cursor-follower { width: 60px; height: 60px; }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9990; opacity: 0.5;
+  }
+
+  /* ─── LOADER ─── */
+  #loader {
+    position: fixed; inset: 0; background: var(--bg);
+    z-index: 9997; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  #loader-text {
+    font-family: 'Syne', sans-serif; font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 800; color: var(--fg);
+    overflow: hidden; display: flex;
+  }
+  #loader-text span { display: inline-block; transform: translateY(110%); animation: slideUp 0.7s cubic-bezier(.76,0,.24,1) forwards; }
+  #loader-text span:nth-child(1){animation-delay:0.1s}
+  #loader-text span:nth-child(2){animation-delay:0.16s}
+  #loader-text span:nth-child(3){animation-delay:0.22s}
+  #loader-text span:nth-child(4){animation-delay:0.28s}
+  #loader-text span:nth-child(5){animation-delay:0.34s}
+  #loader-text span:nth-child(6){animation-delay:0.4s}
+  #loader-text span:nth-child(7){animation-delay:0.46s}
+  #loader-text span:nth-child(8){animation-delay:0.52s}
+  #loader-text span:nth-child(9){animation-delay:0.58s}
+  #loader-text span:nth-child(10){animation-delay:0.64s}
+  #loader-bar { width: 200px; height: 1px; background: var(--muted); overflow: hidden; }
+  #loader-bar::after {
+    content: ''; display: block; height: 100%; background: var(--accent);
+    animation: loadBar 1.8s cubic-bezier(.76,0,.24,1) forwards;
+  }
+  @keyframes loadBar { from {width:0} to {width:100%} }
+  @keyframes slideUp { to { transform: translateY(0) } }
+  #loader.out { animation: loaderOut 0.8s cubic-bezier(.76,0,.24,1) forwards; }
+  @keyframes loaderOut { to { transform: translateY(-100%); } }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 50%; z-index: 100;
+    transform: translateX(-50%);
+    width: 100%; max-width: 1440px;
+    padding: 24px 48px; display: flex; justify-content: space-between; align-items: center;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;
+    color: var(--fg); text-decoration: none; letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 0.8rem; color: var(--fg); text-decoration: none;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    position: relative; overflow: hidden; display: inline-block;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px;
+    background: var(--accent); transition: width 0.4s cubic-bezier(.76,0,.24,1);
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ─── SECTIONS ─── */
+  section { position: relative; }
+
+  /* ─── HERO ─── */
+  #hero {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    align-items: end;
+    padding: 0 60px 72px 60px;
+    position: relative;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  /* ── VIDEO BACKGROUND ── */
+  #hero-video-bg {
+    position: absolute; inset: 0;
+    z-index: 0; overflow: hidden;
+  }
+  #hero-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.22;
+    filter: grayscale(80%) contrast(1.1);
+    will-change: opacity;
+    transition: opacity 1.2s ease;
+  }
+  /* Primary dark overlay — ensures WCAG AA on all text */
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      linear-gradient(105deg,
+        rgba(8,8,8,0.97) 0%,
+        rgba(8,8,8,0.88) 42%,
+        rgba(8,8,8,0.55) 72%,
+        rgba(8,8,8,0.40) 100%
+      );
+  }
+  /* Accent color wash — right-side ambient glow */
+  .hero-overlay-accent {
+    position: absolute; inset: 0; z-index: 2;
+    background: radial-gradient(
+      ellipse 55% 65% at 78% 48%,
+      rgba(200,240,77,0.055) 0%,
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+  /* Bottom vignette for grounding the layout */
+  .hero-overlay-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 220px; z-index: 2;
+    background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ── HERO LEFT CONTENT ── */
+  .hero-left {
+    position: relative; z-index: 5;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 0;
+  }
+  /* ── HERO RIGHT (AVATAR COLUMN) ── */
+  .hero-right {
+    position: relative; z-index: 5;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 0;
+    overflow: visible;
+  }
+
+  /* ── AVATAR WRAPPER ── */
+  #hero-avatar-wrap {
+    position: relative;
+    width: 340px;
+    height: 440px;
+    opacity: 0;
+    animation: avatarReveal 1.1s 2.35s cubic-bezier(.76,0,.24,1) forwards;
+    will-change: transform, opacity;
+    margin: 0 auto;
+  }
+  @keyframes avatarReveal {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── AVATAR CARD (background container) ── */
+  .avatar-card {
+    position: absolute; inset: 0;
+    border-radius: 32px;
+    background: transparent;
+    overflow: visible;
+  }
+  .avatar-card::before { display: none; }
+  .avatar-card::after { display: none; }
+
+  /* ── SVG ILLUSTRATED AVATAR ── */
+  .avatar-illustration {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 310px;
+    height: 400px;
+    animation: avatarFloat 4s ease-in-out infinite;
+  }
+  @keyframes avatarFloat {
+    0%,100% { transform: translateX(-50%) translateY(0px); }
+    50%      { transform: translateX(-50%) translateY(-14px); }
+  }
+
+  /* ── ORBIT RINGS ── */
+  .orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    top: 50%; left: 50%;
+  }
+  .orbit-ring-1 {
+    width: 360px; height: 360px;
+    margin: -180px 0 0 -180px;
+    border: 1px solid rgba(200,240,77,0.12);
+    animation: orbitSpin 22s linear infinite;
+  }
+  .orbit-ring-2 {
+    width: 280px; height: 280px;
+    margin: -140px 0 0 -140px;
+    border: 1px dashed rgba(200,240,77,0.08);
+    animation: orbitSpin 16s linear infinite reverse;
+  }
+  @keyframes orbitSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  /* dot on ring 1 */
+  .orbit-ring-1::after {
+    content: '';
+    position: absolute;
+    width: 7px; height: 7px;
+    background: #c8f04d;
+    border-radius: 50%;
+    top: -3px; left: 50%;
+    margin-left: -3px;
+    box-shadow: 0 0 10px 2px rgba(200,240,77,0.6);
+  }
+  /* dot on ring 2 */
+  .orbit-ring-2::before {
+    content: '';
+    position: absolute;
+    width: 5px; height: 5px;
+    background: rgba(200,240,77,0.6);
+    border-radius: 50%;
+    bottom: -2px; right: 30%;
+    box-shadow: 0 0 8px rgba(200,240,77,0.4);
+  }
+
+  /* ── AVATAR GLOW ── */
+  .avatar-glow {
+    position: absolute;
+    width: 320px; height: 320px;
+    top: 50%; left: 50%;
+    margin: -160px 0 0 -160px;
+    background: radial-gradient(circle, rgba(200,240,77,0.10) 0%, transparent 68%);
+    pointer-events: none;
+    animation: glowBreath 4.5s ease-in-out infinite;
+  }
+  @keyframes glowBreath {
+    0%,100% { opacity:0.55; transform:scale(1); }
+    50%      { opacity:1;    transform:scale(1.08); }
+  }
+
+  /* ── AVATAR FLOATING BADGE ── */
+  .avatar-badge {
+    position: absolute;
+    left: 0px; bottom: 60px;
+    background: rgba(8,8,8,0.92);
+    border: 1px solid rgba(200,240,77,0.25);
+    padding: 10px 18px 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: badgeFloat 3.5s ease-in-out infinite;
+    z-index: 10;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  @keyframes badgeFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+  }
+  .badge-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(200,240,77,0.7);
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+  .badge-text {
+    font-size: 0.68rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--mid);
+    white-space: nowrap;
+  }
+  .badge-text strong {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem; font-weight: 700;
+    color: var(--fg); letter-spacing: -0.01em;
+    margin-bottom: 1px;
+  }
+
+  /* ── AVATAR SKILL CHIP (top-right) ── */
+  .avatar-chip {
+    position: absolute;
+    right: 4px; top: 80px;
+    background: var(--accent);
+    color: #080808;
+    padding: 8px 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    animation: chipFloat 4s 0.8s ease-in-out infinite;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(200,240,77,0.3);
+  }
+  @keyframes chipFloat {
+    0%,100% { transform: translateY(0) rotate(0.5deg); }
+    50%      { transform: translateY(-9px) rotate(-0.5deg); }
+  }
+
+  /* ── HERO TEXT (z-index above all overlays) ── */
+  .hero-tag,
+  .hero-title,
+  .hero-sub,
+  .hero-scroll { position: relative; z-index: 5; }
+
+  .hero-tag {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 24px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.8s 2.2s cubic-bezier(.76,0,.24,1) forwards;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(3rem, 6.5vw, 7.5rem);
+    font-weight: 800; line-height: 0.92; letter-spacing: -0.04em;
+    color: var(--fg);
+  }
+  .hero-title .line { overflow: hidden; display: block; }
+  .hero-title .line span {
+    display: block; transform: translateY(110%);
+    animation: slideUp 0.9s cubic-bezier(.76,0,.24,1) forwards;
+  }
+  .hero-title .line:nth-child(1) span { animation-delay: 2.0s; }
+  .hero-title .line:nth-child(2) span { animation-delay: 2.1s; }
+  .hero-title .line:nth-child(3) span { animation-delay: 2.2s; }
+
+  .hero-sub {
+    margin-top: 36px; display: flex; flex-direction: column; gap: 28px;
+    opacity: 0; animation: fadeUp 0.8s 2.5s cubic-bezier(.76,0,.24,1) forwards;
+  }
+  .hero-desc { max-width: 420px; font-size: 1rem; color: var(--mid); line-height: 1.7; }
+  .hero-cta { display: flex; gap: 16px; align-items: center; }
+  .btn-primary {
+    background: var(--accent); color: #080808;
+    padding: 14px 32px; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.85rem; letter-spacing: 0.05em; text-decoration: none;
+    border: none; cursor: none;
+    position: relative; overflow: hidden;
+    transition: color 0.4s;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0;
+    background: #080808; transform: translateY(101%);
+    transition: transform 0.4s cubic-bezier(.76,0,.24,1);
+  }
+  .btn-primary:hover { color: var(--accent); }
+  .btn-primary:hover::before { transform: translateY(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-outline {
+    color: var(--fg); font-size: 0.85rem; letter-spacing: 0.1em;
+    text-decoration: none; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+    position: relative;
+  }
+  .btn-outline::after {
+    content: '→'; display: inline-block;
+    transition: transform 0.3s;
+  }
+  .btn-outline:hover::after { transform: translateX(6px); }
+
+  .hero-scroll {
+    position: absolute; bottom: 60px; right: 64px;
+    writing-mode: vertical-rl; font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid);
+    display: flex; align-items: center; gap: 12px;
+    opacity: 0; animation: fadeUp 0.8s 2.8s forwards;
+    z-index: 6;
+  }
+  .hero-scroll::before {
+    content: ''; display: block; width: 1px; height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--mid));
+    animation: scrollLine 1.5s 3s ease-in-out infinite;
+  }
+  @keyframes scrollLine { 0%,100%{height:60px;opacity:1} 50%{height:30px;opacity:0.3} }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    border-top: 1px solid var(--muted); border-bottom: 1px solid var(--muted);
+    overflow: hidden; padding: 20px 0;
+  }
+  .marquee-track {
+    display: flex; gap: 0; white-space: nowrap;
+    animation: marquee 18s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Syne', sans-serif; font-size: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 0 40px; color: var(--mid);
+    display: flex; align-items: center; gap: 40px;
+  }
+  .marquee-item .dot { color: var(--accent); font-size: 1.5em; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── ABOUT ─── */
+  #about {
+    padding: 140px 48px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .about-left {}
+  .section-label {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::before { content: ''; width: 40px; height: 1px; background: var(--accent); }
+  .about-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 32px;
+  }
+  .about-title em { font-style: italic; color: var(--accent); }
+  .about-body { font-size: 1.05rem; color: var(--mid); line-height: 1.9; }
+  .about-right { display: flex; flex-direction: column; gap: 32px; }
+  .about-card {
+    background: #111; border: 1px solid var(--muted);
+    padding: 28px; position: relative; overflow: hidden;
+    transition: border-color 0.3s, transform 0.4s;
+  }
+  .about-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0;
+    background: var(--accent); transition: height 0.4s cubic-bezier(.76,0,.24,1);
+  }
+  .about-card:hover { border-color: var(--accent); transform: translateX(6px); }
+  .about-card:hover::before { height: 100%; }
+  .about-card-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; color: var(--accent); opacity: 0.2; line-height: 1; margin-bottom: 4px; }
+  .about-card-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+  .about-card-text { font-size: 0.9rem; color: var(--mid); line-height: 1.7; }
+
+  /* ─── SKILLS ─── */
+  #skills { padding: 100px 48px; background: #0d0d0d; }
+  .skills-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 80px; }
+  .skills-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800; letter-spacing: -0.03em;
+  }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .skill-item {
+    background: #111; padding: 40px 32px;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+  }
+  .skill-item::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--accent); transform: translateY(101%);
+    transition: transform 0.5s cubic-bezier(.76,0,.24,1); z-index: 0;
+  }
+  .skill-item:hover::after { transform: translateY(0); }
+  .skill-item:hover .skill-icon, .skill-item:hover .skill-name, .skill-item:hover .skill-desc { color: #080808; z-index: 1; position: relative; }
+  .skill-icon { font-size: 2rem; margin-bottom: 16px; position: relative; z-index: 1; transition: color 0.3s; }
+  .skill-name { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; transition: color 0.3s; }
+  .skill-desc { font-size: 0.85rem; color: var(--mid); position: relative; z-index: 1; transition: color 0.3s; line-height: 1.6; }
+  .skill-item:hover .skill-desc { color: rgba(8,8,8,0.7); }
+
+  /* ─── EXPERIENCE ─── */
+  #experience { padding: 120px 48px; }
+  .exp-header { margin-bottom: 80px; }
+  .exp-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.03em; }
+  .exp-list { border-top: 1px solid var(--muted); }
+  .exp-item {
+    border-bottom: 1px solid var(--muted); padding: 40px 0;
+    display: grid; grid-template-columns: 200px 1fr auto;
+    gap: 40px; align-items: start;
+    transition: padding 0.4s;
+    position: relative; overflow: hidden;
+  }
+  .exp-item::before {
+    content: ''; position: absolute; bottom: 0; left: 0; height: 1px;
+    background: var(--accent); width: 0;
+    transition: width 0.6s cubic-bezier(.76,0,.24,1);
+  }
+  .exp-item:hover::before { width: 100%; }
+  .exp-item:hover { padding-left: 16px; }
+  .exp-date { font-size: 0.8rem; color: var(--mid); padding-top: 6px; }
+  .exp-role { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  .exp-company { font-size: 0.9rem; color: var(--accent); margin-top: 4px; }
+  .exp-bullets { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .exp-bullets li { font-size: 0.9rem; color: var(--mid); list-style: none; display: flex; gap: 8px; }
+  .exp-bullets li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+  .exp-tag { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg); background: var(--muted); padding: 4px 12px; height: fit-content; }
+
+  /* ─── PROJECTS ─── */
+  #projects { padding: 100px 48px; background: #0d0d0d; }
+  .proj-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 80px; }
+  .proj-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; letter-spacing: -0.03em; }
+  .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .proj-card {
+    background: #111; padding: 60px 48px;
+    position: relative; overflow: hidden;
+    min-height: 380px; display: flex; flex-direction: column; justify-content: flex-end;
+    transition: transform 0.4s;
+    group: true;
+  }
+  .proj-card-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+    transition: transform 0.6s cubic-bezier(.76,0,.24,1);
+  }
+  .proj-card:hover .proj-card-bg { transform: scale(1.05); }
+  .proj-card-num {
+    position: absolute; top: 40px; right: 40px;
+    font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800;
+    color: var(--fg); opacity: 0.05; line-height: 1;
+  }
+  .proj-card-accent {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px; background: var(--accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.5s cubic-bezier(.76,0,.24,1);
+  }
+  .proj-card:hover .proj-card-accent { transform: scaleX(1); }
+  .proj-card-content { position: relative; z-index: 1; }
+  .proj-cat { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .proj-name { font-family: 'Syne', sans-serif; font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .proj-desc { font-size: 0.9rem; color: var(--mid); line-height: 1.7; margin-bottom: 24px; }
+  .proj-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .proj-tags span { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid); border: 1px solid var(--muted); padding: 4px 10px; }
+  .proj-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--fg); text-decoration: none;
+    transition: color 0.3s, gap 0.3s;
+  }
+  .proj-link:hover { color: var(--accent); gap: 14px; }
+  .proj-card.large { grid-column: span 2; }
+  .proj-card.large .proj-name { font-size: clamp(2rem, 4vw, 3rem); }
+
+  /* ─── CONTACT ─── */
+  #contact {
+    padding: 140px 48px; background: var(--accent);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  #contact::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(0,0,0,0.03) 4px, rgba(0,0,0,0.03) 5px);
+  }
+  .contact-pre { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(8,8,8,0.5); margin-bottom: 24px; }
+  .contact-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(3rem, 10vw, 9rem);
+    font-weight: 800; line-height: 0.9; letter-spacing: -0.04em; color: #080808;
+    position: relative; z-index: 1; margin-bottom: 40px;
+  }
+  .contact-email {
+    font-size: clamp(1rem, 2vw, 1.2rem); color: rgba(8,8,8,0.6);
+    text-decoration: none; position: relative; z-index: 1;
+    border-bottom: 1px solid rgba(8,8,8,0.3); padding-bottom: 4px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .contact-email:hover { color: #080808; border-color: #080808; }
+  .contact-links { display: flex; gap: 32px; margin-top: 48px; position: relative; z-index: 1; }
+  .contact-link {
+    font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(8,8,8,0.6); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .contact-link:hover { color: #080808; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #080808; padding: 32px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--muted);
+  }
+  .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; }
+  .footer-copy { font-size: 0.8rem; color: var(--mid); }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(.76,0,.24,1), transform 0.9s cubic-bezier(.76,0,.24,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.9s cubic-bezier(.76,0,.24,1), transform 0.9s cubic-bezier(.76,0,.24,1); }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  /* ─── FLOATING ELEMENTS ─── */
+  .float-badge {
+    position: fixed; bottom: 32px; left: max(48px, calc(50vw - 672px));
+    background: #111; border: 1px solid var(--muted);
+    padding: 10px 16px; font-size: 0.7rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--mid);
+    display: flex; align-items: center; gap: 8px; z-index: 100;
+    opacity: 0; animation: fadeUp 1s 3.5s forwards;
+  }
+  .float-badge .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+
+  /* ════════════════════════════════════════
+     RESPONSIVE — TABLET  (769px – 1100px)
+  ════════════════════════════════════════ */
+  @media (max-width: 1100px) and (min-width: 769px) {
+    nav { padding: 20px 36px; }
+
+    #hero {
+      grid-template-columns: 1fr 300px;
+      padding: 0 36px 56px;
+    }
+    .hero-title { font-size: clamp(2.8rem, 5.5vw, 5.5rem); }
+    .hero-desc { max-width: 340px; font-size: 0.95rem; }
+
+    #hero-avatar-wrap { width: 280px; height: 360px; margin: 0 auto; }
+    .orbit-ring-1 { width: 300px; height: 300px; margin: -150px 0 0 -150px; }
+    .orbit-ring-2 { width: 230px; height: 230px; margin: -115px 0 0 -115px; }
+    .avatar-glow  { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+    .avatar-illustration { width: 258px; height: 330px; }
+    .avatar-badge { left: 0; bottom: 44px; }
+    .avatar-chip  { right: 4px; top: 56px; }
+
+    #about { padding: 100px 36px; gap: 48px; }
+    #skills, #projects { padding: 80px 36px; }
+    .skills-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 48px; }
+    .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    #experience { padding: 100px 36px; }
+    .exp-item { grid-template-columns: 160px 1fr auto; gap: 24px; }
+    #contact { padding: 100px 36px; }
+    footer { padding: 28px 36px; }
+  }
+
+  /* ════════════════════════════════════════
+     RESPONSIVE — MOBILE  (≤ 768px)
+  ════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* ── NAV ── */
+    nav {
+      padding: 18px 20px;
+      mix-blend-mode: normal;
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .nav-links { display: none; }
+
+    /* ── HERO: stacked single column ── */
+    #hero {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr auto;
+      height: 100svh;
+      padding: 80px 20px 40px;
+      align-items: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    /* Avatar shows above text on mobile — small, centered */
+    .hero-right {
+      display: flex;
+      order: -1;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      padding-top: 0;
+      margin-bottom: 8px;
+    }
+    #hero-avatar-wrap {
+      width: 220px;
+      height: 270px;
+      margin: 0 auto;
+    }
+    .orbit-ring-1 { width: 220px; height: 220px; margin: -110px 0 0 -110px; }
+    .orbit-ring-2 { width: 170px; height: 170px; margin: -85px 0 0 -85px; }
+    .avatar-glow  { width: 200px; height: 200px; margin: -100px 0 0 -100px; }
+    .avatar-illustration { width: 200px; height: 256px; }
+    /* Hide decorative floating UI elements on mobile — too cramped */
+    .avatar-badge { display: none; }
+    .avatar-chip  { display: none; }
+
+    /* Left hero content — centered */
+    .hero-left {
+      width: 100%;
+      align-items: center;
+      text-align: center;
+    }
+    .hero-tag { font-size: 0.65rem; margin-bottom: 14px; }
+    .hero-title {
+      font-size: clamp(2.4rem, 11vw, 4rem);
+      line-height: 0.95;
+      text-align: center;
+    }
+    .hero-sub {
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .hero-desc {
+      max-width: 100%;
+      font-size: 0.92rem;
+      text-align: center;
+    }
+    .hero-cta {
+      flex-direction: column;
+      width: 100%;
+      gap: 12px;
+    }
+    .btn-primary {
+      display: block;
+      text-align: center;
+      padding: 16px 24px;
+      font-size: 0.9rem;
+    }
+    .btn-outline {
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .hero-scroll { display: none; }
+
+    /* ── ABOUT ── */
+    #about {
+      grid-template-columns: 1fr;
+      padding: 72px 20px;
+      gap: 48px;
+    }
+    .about-title { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+    .about-body  { font-size: 0.95rem; }
+
+    /* ── SKILLS ── */
+    #skills { padding: 72px 20px; }
+    .skills-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .skills-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+    .skills-grid { grid-template-columns: 1fr; gap: 2px; }
+    .skill-item { padding: 28px 24px; }
+
+    /* ── EXPERIENCE ── */
+    #experience { padding: 72px 20px; }
+    .exp-header  { margin-bottom: 40px; }
+    .exp-title   { font-size: clamp(1.8rem, 8vw, 3rem); }
+    .exp-item {
+      grid-template-columns: 1fr;
+      padding: 28px 0;
+      gap: 10px;
+    }
+    .exp-item:hover { padding-left: 0; }
+    .exp-date  { font-size: 0.75rem; }
+    .exp-role  { font-size: 1.2rem; }
+    .exp-tag   {
+      width: fit-content;
+      margin-top: 4px;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { padding: 72px 20px; }
+    .proj-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .proj-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+    .proj-grid  { grid-template-columns: 1fr; gap: 2px; }
+    .proj-card  { padding: 36px 24px; min-height: 280px; }
+    .proj-card.large { grid-column: span 1; }
+    .proj-card.large .proj-name { font-size: clamp(1.4rem, 6vw, 2rem); }
+    .proj-card-num { font-size: 3rem; top: 24px; right: 24px; }
+
+    /* ── MARQUEE ── */
+    .marquee-item { font-size: 0.9rem; padding: 0 20px; gap: 20px; }
+
+    /* ── CONTACT ── */
+    #contact { padding: 72px 20px; }
+    .contact-title { font-size: clamp(3rem, 18vw, 6rem); }
+    .contact-email { font-size: 0.9rem; word-break: break-all; }
+    .contact-links {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      padding: 24px 20px;
+    }
+
+    /* ── MISC ── */
+    .float-badge { display: none; }
+    #cursor, #cursor-follower { display: none; }
+    body { cursor: auto; }
+  }
+
+  /* ── Extra small phones (≤ 380px) ── */
+  @media (max-width: 380px) {
+    #hero { padding: 72px 16px 36px; }
+    .hero-title { font-size: clamp(2rem, 12vw, 3rem); }
+    #hero-avatar-wrap { width: 180px; height: 220px; }
+    .orbit-ring-1 { width: 190px; height: 190px; margin: -95px 0 0 -95px; }
+    .orbit-ring-2 { width: 148px; height: 148px; margin: -74px 0 0 -74px; }
+    .avatar-illustration { width: 168px; height: 216px; }
+    #about, #skills, #experience, #projects, #contact { padding: 60px 16px; }
+    .proj-card { padding: 28px 18px; }
+  }
+  /* ─── HAMBURGER ─── */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 200;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--fg);
+    transition: transform 0.35s cubic-bezier(.76,0,.24,1), opacity 0.3s, width 0.3s;
+    transform-origin: center;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── MOBILE MENU ─── */
+  #mobile-menu {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(8,8,8,0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 150;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.4s cubic-bezier(.76,0,.24,1), transform 0.4s cubic-bezier(.76,0,.24,1);
+    pointer-events: none;
+  }
+  #mobile-menu.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+  #mobile-menu a {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    text-decoration: none;
+    line-height: 1.2;
+    transition: color 0.25s;
+    position: relative;
+  }
+  #mobile-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0; height: 3px;
+    background: var(--accent);
+    transition: width 0.35s cubic-bezier(.76,0,.24,1);
+  }
+  #mobile-menu a:hover { color: var(--accent); }
+  #mobile-menu a:hover::after { width: 100%; }
+
+  @media (max-width: 768px) {
+    .nav-hamburger { display: flex; }
+    #mobile-menu { display: flex; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-follower"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div id="loader-text">
+    <span>A</span><span>M</span><span>A</span><span>N</span><span>&nbsp;</span><span>V</span><span>A</span><span>R</span><span>M</span><span>A</span>
+  </div>
+  <div id="loader-bar"></div>
+</div>
+
+<!-- AVAILABLE BADGE -->
+<div class="float-badge">
+  <div class="pulse"></div>
+  Available for work
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">AV</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <button class="nav-hamburger" aria-label="Open menu" onclick="this.classList.toggle('open'); document.getElementById('mobile-menu').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU OVERLAY -->
+<div id="mobile-menu">
+  <a href="#about"      onclick="document.getElementById('mobile-menu').classList.remove('open');document.querySelector('.nav-hamburger').classList.remove('open')">About</a>
+  <a href="#skills"     onclick="document.getElementById('mobile-menu').classList.remove('open');document.querySelector('.nav-hamburger').classList.remove('open')">Skills</a>
+  <a href="#experience" onclick="document.getElementById('mobile-menu').classList.remove('open');document.querySelector('.nav-hamburger').classList.remove('open')">Experience</a>
+  <a href="#projects"   onclick="document.getElementById('mobile-menu').classList.remove('open');document.querySelector('.nav-hamburger').classList.remove('open')">Work</a>
+  <a href="#contact"    onclick="document.getElementById('mobile-menu').classList.remove('open');document.querySelector('.nav-hamburger').classList.remove('open')">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+
+  <!-- ── VIDEO BACKGROUND ── -->
+  <div id="hero-video-bg" aria-hidden="true">
+    <!--
+      Replace src with your own looping ambient video.
+      Ideal: dark abstract, particles, grid, or architectural footage.
+      Free sources: coverr.co · pexels.com/videos · mixkit.co
+      Target: dark MP4, ~2–4MB, 1920×1080, no text/faces.
+    -->
+    <video
+      id="hero-video"
+      autoplay muted loop playsinline
+      preload="metadata"
+    >
+      <source src="https://cdn.coverr.co/videos/coverr-dark-particles-7046/mp4" type="video/mp4">
+      <source src="https://cdn.coverr.co/videos/coverr-abstract-dark-background-4703/mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-overlay-accent"></div>
+    <div class="hero-overlay-bottom"></div>
+  </div>
+
+  <!-- ── LEFT: TEXT CONTENT ── -->
+  <div class="hero-left">
+    <div class="hero-tag">UI/UX Designer · Product Design · Hyderabad</div>
+
+    <h1 class="hero-title">
+      <span class="line"><span>Designing</span></span>
+      <span class="line"><span>Digital</span></span>
+      <span class="line"><span><em style="color:var(--accent);font-style:italic">Experiences.</em></span></span>
+    </h1>
+
+    <div class="hero-sub">
+      <p class="hero-desc">I craft user interfaces that are both beautiful and functional — turning complex problems into intuitive, pixel-perfect products.</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary"><span>View My Work</span></a>
+        <a href="#contact" class="btn-outline">Say Hello</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: ANIMATED AVATAR ── -->
+  <div class="hero-right">
+    <div id="hero-avatar-wrap" aria-hidden="true">
+
+      <!-- Orbit rings (outside card) -->
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="avatar-glow"></div>
+
+      <!-- Avatar card container -->
+      <div class="avatar-card">
+
+        <!-- 3D cute character — WHITE body 90% + ORANGE accents 10% -->
+        <svg class="avatar-illustration" viewBox="0 0 360 460" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cute 3D character avatar — white with orange accents">
+          <defs>
+            <!-- WHITE body base with 3D sphere sheen -->
+            <radialGradient id="bodyBase" cx="35%" cy="28%" r="70%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="55%" stop-color="#f0f0f0"/>
+              <stop offset="100%" stop-color="#d8d8d8"/>
+            </radialGradient>
+            <!-- Head base — warm white -->
+            <radialGradient id="headBase" cx="36%" cy="26%" r="68%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="50%" stop-color="#f5f5f5"/>
+              <stop offset="100%" stop-color="#dcdcdc"/>
+            </radialGradient>
+            <!-- Head specular (glassy top highlight) -->
+            <radialGradient id="headSpec" cx="32%" cy="18%" r="42%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+            </radialGradient>
+            <!-- Limb base -->
+            <radialGradient id="limbBase" cx="36%" cy="26%" r="68%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="55%" stop-color="#efefef"/>
+              <stop offset="100%" stop-color="#d5d5d5"/>
+            </radialGradient>
+            <!-- ORANGE couch — main accent -->
+            <linearGradient id="couchGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c8f04d"/>
+              <stop offset="100%" stop-color="#8ab52a"/>
+            </linearGradient>
+            <!-- Lime deep shadow -->
+            <linearGradient id="couchShadow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7a9e20"/>
+              <stop offset="100%" stop-color="#5a7a14"/>
+            </linearGradient>
+            <!-- Lime highlight top -->
+            <linearGradient id="couchHigh" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8ff9a"/>
+              <stop offset="100%" stop-color="#c8f04d"/>
+            </linearGradient>
+            <!-- Laptop body — silver/white -->
+            <linearGradient id="laptopGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8e8e8"/>
+              <stop offset="100%" stop-color="#cccccc"/>
+            </linearGradient>
+            <!-- Screen display — dark with orange glow -->
+            <linearGradient id="screenBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#080808"/>
+              <stop offset="100%" stop-color="#050505"/>
+            </linearGradient>
+            <radialGradient id="screenGlow" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="rgba(200,240,77,0.35)"/>
+              <stop offset="100%" stop-color="rgba(200,240,77,0.03)"/>
+            </radialGradient>
+            <!-- Orange iris gradient -->
+            <radialGradient id="irisGrad" cx="40%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#d4f568"/>
+              <stop offset="50%" stop-color="#8ab52a"/>
+              <stop offset="100%" stop-color="#2d5a08"/>
+            </radialGradient>
+            <!-- Orange cheek blush -->
+            <radialGradient id="blushGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(200,240,77,0.35)"/>
+              <stop offset="100%" stop-color="rgba(200,240,77,0)"/>
+            </radialGradient>
+            <!-- Drop shadow -->
+            <radialGradient id="dropShadow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(100,160,20,0.35)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+            <!-- Under-body shadow on couch -->
+            <radialGradient id="seatShadow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(0,0,0,0.2)"/>
+              <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+            <filter id="blur3" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3"/>
+            </filter>
+            <filter id="blur6" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="6"/>
+            </filter>
+            <filter id="blur2">
+              <feGaussianBlur stdDeviation="2"/>
+            </filter>
+          </defs>
+
+          <!-- ══ GROUND SHADOW ══ -->
+          <ellipse cx="183" cy="454" rx="115" ry="13" fill="url(#dropShadow)" filter="url(#blur6)"/>
+
+          <!-- ══ ORANGE COUCH ══ -->
+          <!-- Couch wooden legs -->
+          <rect x="90" y="432" width="14" height="24" rx="5" fill="#1a2a05"/>
+          <rect x="258" y="432" width="14" height="24" rx="5" fill="#1a2a05"/>
+          <!-- Leg highlight -->
+          <rect x="91" y="432" width="5" height="24" rx="3" fill="rgba(255,255,255,0.15)"/>
+          <rect x="259" y="432" width="5" height="24" rx="3" fill="rgba(255,255,255,0.15)"/>
+
+          <!-- Couch seat base -->
+          <rect x="64" y="386" width="234" height="52" rx="20" fill="url(#couchGrad)"/>
+          <!-- Seat top highlight (3D rounded top edge) -->
+          <rect x="64" y="386" width="234" height="18" rx="18" fill="url(#couchHigh)"/>
+          <!-- Seat front shadow -->
+          <rect x="64" y="422" width="234" height="16" rx="0 0 20 20" fill="url(#couchShadow)"/>
+          <!-- Seat bottom stitch line -->
+          <path d="M80 430 Q183 435 286 430" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4,5" fill="none"/>
+          <!-- Seat shadow from body weight -->
+          <ellipse cx="183" cy="400" rx="80" ry="18" fill="url(#seatShadow)"/>
+
+          <!-- Couch back -->
+          <rect x="68" y="322" width="226" height="80" rx="24" fill="url(#couchGrad)"/>
+          <!-- Back top highlight -->
+          <rect x="68" y="322" width="226" height="20" rx="20" fill="url(#couchHigh)"/>
+          <!-- Back bottom shadow -->
+          <rect x="68" y="382" width="226" height="20" rx="0 0 24 24" fill="url(#couchShadow)"/>
+          <!-- Back stitch line -->
+          <path d="M84 346 Q183 340 278 346" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4,5" fill="none"/>
+          <!-- Back center button -->
+          <circle cx="183" cy="358" r="6" fill="url(#couchShadow)"/>
+          <circle cx="183" cy="358" r="3.5" fill="rgba(255,255,255,0.15)"/>
+
+          <!-- Left armrest -->
+          <rect x="58" y="348" width="34" height="76" rx="17" fill="url(#couchGrad)"/>
+          <rect x="58" y="348" width="34" height="18" rx="16" fill="url(#couchHigh)"/>
+          <rect x="58" y="408" width="34" height="16" rx="0 0 17 17" fill="url(#couchShadow)"/>
+          <!-- Right armrest -->
+          <rect x="270" y="348" width="34" height="76" rx="17" fill="url(#couchGrad)"/>
+          <rect x="270" y="348" width="34" height="18" rx="16" fill="url(#couchHigh)"/>
+          <rect x="270" y="408" width="34" height="16" rx="0 0 17 17" fill="url(#couchShadow)"/>
+
+          <!-- ══ CHARACTER BODY (white/round) ══ -->
+          <!-- Body shadow on couch -->
+          <ellipse cx="183" cy="405" rx="72" ry="20" fill="rgba(0,0,0,0.12)" filter="url(#blur3)"/>
+          <!-- Main torso -->
+          <ellipse cx="183" cy="360" rx="74" ry="66" fill="url(#bodyBase)"/>
+          <!-- Body 3D top-left specular -->
+          <ellipse cx="157" cy="330" rx="40" ry="30" fill="rgba(255,255,255,0.7)"/>
+          <!-- Body bottom shade -->
+          <ellipse cx="183" cy="415" rx="58" ry="18" fill="rgba(180,180,180,0.35)"/>
+
+          <!-- T-shirt / hoodie detail (orange accent ~10%) -->
+          <!-- Collar -->
+          <path d="M162 310 Q183 326 204 310" fill="rgba(200,240,77,0.15)" stroke="#c8f04d" stroke-width="2"/>
+          <!-- Center line -->
+          <line x1="183" y1="318" x2="183" y2="395" stroke="rgba(200,240,77,0.2)" stroke-width="1.5" stroke-dasharray="3,4"/>
+          <!-- Left pocket -->
+          <rect x="128" y="362" width="36" height="28" rx="9" fill="rgba(255,255,255,0.5)" stroke="#c8f04d" stroke-width="1.2" opacity="0.7"/>
+          <!-- Right pocket -->
+          <rect x="200" y="362" width="36" height="28" rx="9" fill="rgba(255,255,255,0.5)" stroke="#c8f04d" stroke-width="1.2" opacity="0.7"/>
+          <!-- Orange pocket dots -->
+          <circle cx="146" cy="371" r="3" fill="#c8f04d" opacity="0.6"/>
+          <circle cx="218" cy="371" r="3" fill="#c8f04d" opacity="0.6"/>
+
+          <!-- ══ LEFT ARM ══ -->
+          <ellipse cx="116" cy="346" rx="22" ry="30" fill="url(#limbBase)" transform="rotate(-12 116 346)"/>
+          <ellipse cx="97" cy="382" rx="18" ry="24" fill="url(#limbBase)" transform="rotate(-8 97 382)"/>
+          <!-- Left hand -->
+          <ellipse cx="88" cy="404" rx="20" ry="15" fill="url(#headBase)"/>
+          <ellipse cx="83" cy="398" rx="9" ry="7" fill="rgba(255,255,255,0.8)"/>
+          <!-- Finger nubs left -->
+          <ellipse cx="74" cy="400" rx="6" ry="5" fill="url(#headBase)"/>
+          <ellipse cx="83" cy="395" rx="6" ry="5" fill="url(#headBase)"/>
+          <ellipse cx="93" cy="394" rx="6" ry="5" fill="url(#headBase)"/>
+          <ellipse cx="102" cy="399" rx="5" ry="5" fill="url(#headBase)"/>
+          <!-- Knuckle shading -->
+          <ellipse cx="74" cy="401" rx="4" ry="3" fill="rgba(200,200,200,0.4)"/>
+          <ellipse cx="83" cy="396" rx="4" ry="3" fill="rgba(200,200,200,0.4)"/>
+          <ellipse cx="93" cy="395" rx="4" ry="3" fill="rgba(200,200,200,0.4)"/>
+
+          <!-- ══ RIGHT ARM (pointing up/out) ══ -->
+          <ellipse cx="250" cy="342" rx="22" ry="30" fill="url(#limbBase)" transform="rotate(14 250 342)"/>
+          <ellipse cx="272" cy="368" rx="17" ry="24" fill="url(#limbBase)" transform="rotate(32 272 368)"/>
+          <!-- Right hand -->
+          <ellipse cx="292" cy="350" rx="18" ry="14" fill="url(#headBase)" transform="rotate(22 292 350)"/>
+          <ellipse cx="287" cy="344" rx="8" ry="6" fill="rgba(255,255,255,0.8)" transform="rotate(22 287 344)"/>
+          <!-- Pointing finger -->
+          <ellipse cx="308" cy="337" rx="6" ry="11" fill="url(#headBase)" transform="rotate(-12 308 337)"/>
+          <ellipse cx="306" cy="331" rx="3" ry="5" fill="rgba(255,255,255,0.7)" transform="rotate(-12 306 331)"/>
+          <!-- Other finger nubs right -->
+          <ellipse cx="300" cy="343" rx="5" ry="4" fill="url(#headBase)" transform="rotate(22 300 343)"/>
+          <ellipse cx="294" cy="358" rx="5" ry="4" fill="url(#headBase)" transform="rotate(22 294 358)"/>
+
+          <!-- ══ LAPTOP (silver/white, orange screen) ══ -->
+          <!-- Laptop base -->
+          <rect x="120" y="300" width="126" height="78" rx="10" fill="url(#laptopGrad)"/>
+          <rect x="120" y="300" width="126" height="10" rx="9" fill="rgba(255,255,255,0.9)"/>
+          <rect x="120" y="358" width="126" height="20" rx="0 0 10 10" fill="rgba(180,180,180,0.5)"/>
+          <!-- Trackpad -->
+          <rect x="160" y="348" width="46" height="22" rx="6" fill="rgba(200,200,200,0.6)" stroke="rgba(150,150,150,0.5)" stroke-width="1"/>
+          <!-- Keyboard rows -->
+          <rect x="126" y="308" width="114" height="3.5" rx="2" fill="rgba(160,160,160,0.5)"/>
+          <rect x="126" y="316" width="114" height="3.5" rx="2" fill="rgba(160,160,160,0.5)"/>
+          <rect x="126" y="324" width="114" height="3.5" rx="2" fill="rgba(160,160,160,0.5)"/>
+          <rect x="126" y="332" width="86" height="3.5" rx="2" fill="rgba(160,160,160,0.5)"/>
+          <!-- Keyboard highlight -->
+          <rect x="126" y="308" width="40" height="3.5" rx="2" fill="rgba(200,240,77,0.4)"/>
+
+          <!-- Screen hinge -->
+          <rect x="120" y="292" width="126" height="8" rx="4" fill="rgba(160,160,160,0.7)"/>
+          <!-- Screen outer frame -->
+          <rect x="114" y="186" width="138" height="108" rx="14" fill="url(#laptopGrad)"/>
+          <rect x="114" y="186" width="138" height="108" rx="14" fill="none" stroke="rgba(180,180,180,0.8)" stroke-width="1"/>
+          <!-- Screen display (orange-tinted dark) -->
+          <rect x="120" y="192" width="126" height="96" rx="10" fill="url(#screenBg)"/>
+          <rect x="120" y="192" width="126" height="96" rx="10" fill="url(#screenGlow)"/>
+          <!-- Top bar on screen -->
+          <rect x="124" y="196" width="118" height="13" rx="3" fill="rgba(200,240,77,0.2)"/>
+          <!-- Traffic light dots -->
+          <circle cx="130" cy="202" r="3" fill="#c8f04d" opacity="0.9"/>
+          <circle cx="139" cy="202" r="3" fill="rgba(255,255,255,0.2)"/>
+          <circle cx="148" cy="202" r="3" fill="rgba(255,255,255,0.15)"/>
+          <!-- Content rows -->
+          <rect x="124" y="214" width="56" height="9" rx="4" fill="#c8f04d" opacity="0.8"/>
+          <rect x="124" y="228" width="82" height="5" rx="2.5" fill="rgba(255,255,255,0.2)"/>
+          <rect x="124" y="237" width="68" height="5" rx="2.5" fill="rgba(255,255,255,0.12)"/>
+          <rect x="124" y="248" width="46" height="15" rx="5" fill="rgba(200,240,77,0.5)" stroke="#c8f04d" stroke-width="1"/>
+          <text x="147" y="259" text-anchor="middle" font-family="sans-serif" font-size="7" font-weight="700" fill="white">DESIGN</text>
+          <!-- Right panel on screen -->
+          <rect x="192" y="214" width="50" height="70" rx="6" fill="rgba(255,255,255,0.06)" stroke="rgba(200,240,77,0.3)" stroke-width="1"/>
+          <rect x="197" y="222" width="40" height="5" rx="2" fill="#c8f04d" opacity="0.6"/>
+          <rect x="197" y="232" width="28" height="4" rx="2" fill="rgba(255,255,255,0.18)"/>
+          <rect x="197" y="240" width="34" height="4" rx="2" fill="rgba(255,255,255,0.12)"/>
+          <circle cx="214" cy="264" r="9" fill="rgba(200,240,77,0.15)" stroke="#c8f04d" stroke-width="1.2"/>
+          <circle cx="214" cy="264" r="5" fill="#c8f04d" opacity="0.8"/>
+          <!-- Logo on lid back -->
+          <circle cx="183" cy="164" r="8" fill="rgba(200,240,77,0.15)" stroke="rgba(200,240,77,0.4)" stroke-width="1.2"/>
+          <text x="183" y="168" text-anchor="middle" font-size="8" fill="rgba(200,240,77,0.7)">✦</text>
+
+          <!-- ══ NECK ══ -->
+          <rect x="166" y="288" width="34" height="28" rx="11" fill="url(#headBase)"/>
+          <rect x="166" y="304" width="34" height="12" rx="6" fill="rgba(200,200,200,0.4)"/>
+
+          <!-- ══ HEAD ══ -->
+          <!-- Head shadow under -->
+          <ellipse cx="183" cy="295" rx="60" ry="14" fill="rgba(160,160,160,0.3)" filter="url(#blur3)"/>
+          <!-- Head main -->
+          <ellipse cx="183" cy="224" rx="80" ry="78" fill="url(#headBase)"/>
+          <!-- Head 3D gloss highlight (large, top-left) -->
+          <ellipse cx="155" cy="192" rx="42" ry="32" fill="rgba(255,255,255,0.75)"/>
+          <!-- Head side shade right -->
+          <ellipse cx="248" cy="240" rx="22" ry="50" fill="rgba(200,200,200,0.4)"/>
+          <!-- Head bottom shade -->
+          <ellipse cx="183" cy="292" rx="62" ry="16" fill="rgba(180,180,180,0.4)"/>
+
+          <!-- ══ EARS (chubby white) ══ -->
+          <!-- Left ear -->
+          <ellipse cx="105" cy="230" rx="17" ry="21" fill="url(#headBase)"/>
+          <ellipse cx="102" cy="226" rx="9" ry="7" fill="rgba(255,255,255,0.8)"/>
+          <!-- Inner ear orange tint -->
+          <ellipse cx="108" cy="232" rx="9" ry="12" fill="rgba(200,240,77,0.12)"/>
+          <!-- Right ear -->
+          <ellipse cx="261" cy="230" rx="17" ry="21" fill="url(#headBase)"/>
+          <ellipse cx="258" cy="226" rx="9" ry="7" fill="rgba(255,255,255,0.8)"/>
+          <ellipse cx="258" cy="232" rx="9" ry="12" fill="rgba(200,240,77,0.12)"/>
+
+          <!-- ══ HAIR (orange!) ══ -->
+          <!-- Hair main mass -->
+          <path d="M112 208 Q115 142 183 138 Q251 142 254 208 Q240 164 183 162 Q126 164 112 208Z" fill="#c8f04d"/>
+          <!-- Hair 3D highlight -->
+          <path d="M128 172 Q158 150 204 158" stroke="rgba(200,240,120,0.7)" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M135 186 Q165 170 210 178" stroke="rgba(200,240,120,0.35)" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Hair shadow underside -->
+          <path d="M112 208 Q110 222 116 240" stroke="#5a7a14" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M254 208 Q256 222 250 240" stroke="#5a7a14" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <!-- Hair side left -->
+          <path d="M112 208 Q108 235 114 252 Q110 228 118 216Z" fill="#c8f04d"/>
+          <!-- Hair side right -->
+          <path d="M254 208 Q258 235 252 252 Q256 228 248 216Z" fill="#c8f04d"/>
+          <!-- Cute hair tufts on top -->
+          <path d="M152 140 Q160 122 168 140" fill="#c8f04d"/>
+          <path d="M175 136 Q183 116 191 136" fill="#d4f568"/>
+          <path d="M198 140 Q206 122 214 140" fill="#c8f04d"/>
+          <!-- Tuft highlights -->
+          <path d="M157 136 Q162 127 166 136" stroke="rgba(200,240,100,0.5)" stroke-width="2" fill="none"/>
+          <path d="M179 132 Q183 120 187 132" stroke="rgba(200,240,100,0.5)" stroke-width="2" fill="none"/>
+
+          <!-- ══ FACE ══ -->
+          <!-- Forehead shade (under hair) -->
+          <ellipse cx="183" cy="186" rx="62" ry="18" fill="rgba(220,220,220,0.25)"/>
+
+          <!-- Orange cheek blush -->
+          <ellipse cx="135" cy="254" rx="22" ry="15" fill="url(#blushGrad)"/>
+          <ellipse cx="231" cy="254" rx="22" ry="15" fill="url(#blushGrad)"/>
+
+          <!-- Left eyebrow (orange/dark) -->
+          <path d="M146 196 Q162 188 177 192" stroke="#5a7a14" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- Right eyebrow -->
+          <path d="M189 192 Q204 188 220 196" stroke="#5a7a14" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+          <!-- Left eye white -->
+          <ellipse cx="160" cy="220" rx="22" ry="24" fill="white"/>
+          <!-- Eye lid shadow -->
+          <ellipse cx="160" cy="208" rx="20" ry="10" fill="rgba(200,200,200,0.3)"/>
+          <!-- Right eye white -->
+          <ellipse cx="206" cy="220" rx="22" ry="24" fill="white"/>
+          <ellipse cx="206" cy="208" rx="20" ry="10" fill="rgba(200,200,200,0.3)"/>
+
+          <!-- Left iris (ORANGE) -->
+          <circle cx="161" cy="222" r="14" fill="#2d5a08"/>
+          <circle cx="161" cy="222" r="11" fill="#7a9e20"/>
+          <circle cx="161" cy="222" r="7.5" fill="url(#irisGrad)"/>
+          <!-- Left pupil -->
+          <circle cx="161" cy="222" r="4.5" fill="#080808"/>
+          <!-- Left gloss highlights -->
+          <ellipse cx="155" cy="215" rx="5.5" ry="4.5" fill="white" opacity="0.95"/>
+          <circle cx="168" cy="228" r="2.5" fill="white" opacity="0.45"/>
+
+          <!-- Right iris (ORANGE) -->
+          <circle cx="207" cy="222" r="14" fill="#2d5a08"/>
+          <circle cx="207" cy="222" r="11" fill="#7a9e20"/>
+          <circle cx="207" cy="222" r="7.5" fill="url(#irisGrad)"/>
+          <!-- Right pupil -->
+          <circle cx="207" cy="222" r="4.5" fill="#080808"/>
+          <!-- Right gloss highlights -->
+          <ellipse cx="201" cy="215" rx="5.5" ry="4.5" fill="white" opacity="0.95"/>
+          <circle cx="214" cy="228" r="2.5" fill="white" opacity="0.45"/>
+
+          <!-- Nose — cute orange button -->
+          <ellipse cx="183" cy="248" rx="8" ry="6" fill="rgba(200,100,50,0.4)"/>
+          <ellipse cx="180" cy="246" rx="3.5" ry="2.5" fill="rgba(255,255,255,0.6)"/>
+
+          <!-- Mouth — big happy smile -->
+          <path d="M155 262 Q170 280 183 283 Q196 280 211 262" fill="none" stroke="#5a7a14" stroke-width="4" stroke-linecap="round"/>
+          <!-- Teeth -->
+          <path d="M160 266 Q183 282 206 266 Q197 280 183 282 Q169 280 160 266Z" fill="white"/>
+          <!-- Smile crease lines -->
+          <path d="M155 262 Q150 270 154 278" stroke="rgba(200,100,50,0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M211 262 Q216 270 212 278" stroke="rgba(200,100,50,0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Dimple dots -->
+          <circle cx="148" cy="265" r="4.5" fill="rgba(200,240,77,0.3)"/>
+          <circle cx="218" cy="265" r="4.5" fill="rgba(200,240,77,0.3)"/>
+        </svg>
+      </div><!-- /avatar-card -->
+
+      <!-- Floating badge (bottom-left of avatar) -->
+      <div class="avatar-badge">
+        <div class="badge-dot"></div>
+        <div class="badge-text">
+          <strong>Aman Varma</strong>
+          Available for work
+        </div>
+      </div>
+
+      <!-- Accent chip (top-right of avatar) -->
+      <div class="avatar-chip">UI / UX</div>
+
+    </div><!-- /hero-avatar-wrap -->
+  </div><!-- /hero-right -->
+
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">UI Design <span class="dot">✦</span></div>
+    <div class="marquee-item">UX Research <span class="dot">✦</span></div>
+    <div class="marquee-item">Design Systems <span class="dot">✦</span></div>
+    <div class="marquee-item">Prototyping <span class="dot">✦</span></div>
+    <div class="marquee-item">Figma Expert <span class="dot">✦</span></div>
+    <div class="marquee-item">Mobile UX <span class="dot">✦</span></div>
+    <div class="marquee-item">Web Design <span class="dot">✦</span></div>
+    <div class="marquee-item">Interaction Design <span class="dot">✦</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item">UI Design <span class="dot">✦</span></div>
+    <div class="marquee-item">UX Research <span class="dot">✦</span></div>
+    <div class="marquee-item">Design Systems <span class="dot">✦</span></div>
+    <div class="marquee-item">Prototyping <span class="dot">✦</span></div>
+    <div class="marquee-item">Figma Expert <span class="dot">✦</span></div>
+    <div class="marquee-item">Mobile UX <span class="dot">✦</span></div>
+    <div class="marquee-item">Web Design <span class="dot">✦</span></div>
+    <div class="marquee-item">Interaction Design <span class="dot">✦</span></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left reveal-left">
+    <div class="section-label">About Me</div>
+    <h2 class="about-title">I design with <em>purpose</em> and precision.</h2>
+    <p class="about-body">Hi, I'm Aman — a UI/UX Designer based in Hyderabad, India. With a background in Computer Science (AI & ML), I blend analytical thinking with a sharp design sensibility to create products people love using. I've shipped production-ready interfaces for startups across productivity, sports, e-commerce, and enterprise.</p>
+  </div>
+  <div class="about-right">
+    <div class="about-card reveal" style="transition-delay:0.1s">
+      <div class="about-card-num">01</div>
+      <div class="about-card-title">Figma Design Systems</div>
+      <div class="about-card-text">Built 3 scalable design systems with 80+ reusable components, reducing dev handoff time by 40%.</div>
+    </div>
+    <div class="about-card reveal" style="transition-delay:0.2s">
+      <div class="about-card-num">02</div>
+      <div class="about-card-title">User-Centered Approach</div>
+      <div class="about-card-text">Improved checkout task success by 25% and reduced navigation friction by 30% through research-backed UX.</div>
+    </div>
+    <div class="about-card reveal" style="transition-delay:0.3s">
+      <div class="about-card-num">03</div>
+      <div class="about-card-title">Full Product Delivery</div>
+      <div class="about-card-text">From wireframes to production. Collaborated with founders and engineers to ship 4+ end-to-end products.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-header">
+    <div>
+      <div class="section-label reveal">Skills & Tools</div>
+      <h2 class="skills-title reveal">What I bring<br>to the table.</h2>
+    </div>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-item reveal" style="transition-delay:0s">
+      <div class="skill-icon">◈</div>
+      <div class="skill-name">Figma & Framer</div>
+      <div class="skill-desc">Design systems, auto-layout, variables, components, interactive prototypes.</div>
+    </div>
+    <div class="skill-item reveal" style="transition-delay:0.1s">
+      <div class="skill-icon">⬡</div>
+      <div class="skill-name">UX Research</div>
+      <div class="skill-desc">Usability testing, user journey mapping, information architecture, competitive analysis.</div>
+    </div>
+    <div class="skill-item reveal" style="transition-delay:0.2s">
+      <div class="skill-icon">◎</div>
+      <div class="skill-name">Mobile & Web UX</div>
+      <div class="skill-desc">Responsive layouts, accessibility, platform-specific interaction patterns.</div>
+    </div>
+    <div class="skill-item reveal" style="transition-delay:0.3s">
+      <div class="skill-icon">⬟</div>
+      <div class="skill-name">Prototyping</div>
+      <div class="skill-desc">High-fidelity interactive flows, micro-interactions, motion design.</div>
+    </div>
+    <div class="skill-item reveal" style="transition-delay:0.4s">
+      <div class="skill-icon">△</div>
+      <div class="skill-name">Frontend Dev</div>
+      <div class="skill-desc">HTML, CSS, JavaScript — bridges the gap between design and engineering.</div>
+    </div>
+    <div class="skill-item reveal" style="transition-delay:0.5s">
+      <div class="skill-icon">◇</div>
+      <div class="skill-name">Adobe Photoshop</div>
+      <div class="skill-desc">Visual design, image editing, brand assets and marketing materials.</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="exp-header">
+    <div class="section-label reveal">Experience</div>
+    <h2 class="exp-title reveal">Where I've<br>been building.</h2>
+  </div>
+  <div class="exp-list">
+    <div class="exp-item reveal">
+      <div class="exp-date">Aug 2025 — Present</div>
+      <div>
+        <div class="exp-role">UI/UX Designer</div>
+        <div class="exp-company">Freelance · Remote</div>
+        <ul class="exp-bullets">
+          <li>Led UI/UX delivery for 4+ productivity, sports, and e-commerce products</li>
+          <li>Boosted engagement 20% through improved onboarding and dashboard UX</li>
+          <li>Built 3 scalable Figma design systems with 80+ reusable components</li>
+        </ul>
+      </div>
+      <span class="exp-tag">Active</span>
+    </div>
+    <div class="exp-item reveal" style="transition-delay:0.1s">
+      <div class="exp-date">Oct 2025 — Nov 2025</div>
+      <div>
+        <div class="exp-role">UI/UX Intern</div>
+        <div class="exp-company">SarvM AI · Remote</div>
+        <ul class="exp-bullets">
+          <li>Designed interaction flows for 15+ core screens of a retailer-facing app</li>
+          <li>Improved checkout task success by 25% through optimized user journeys</li>
+          <li>Created 30+ low and high-fidelity screens for low-tech user accessibility</li>
+        </ul>
+      </div>
+      <span class="exp-tag">Retail AI</span>
+    </div>
+    <div class="exp-item reveal" style="transition-delay:0.2s">
+      <div class="exp-date">Aug 2025 — Oct 2025</div>
+      <div>
+        <div class="exp-role">UI/UX Intern</div>
+        <div class="exp-company">Pitchmatter · Remote</div>
+        <ul class="exp-bullets">
+          <li>Designed responsive dashboards and multi-step onboarding flows</li>
+          <li>Reduced navigation friction by 30% using hierarchy and filtering improvements</li>
+        </ul>
+      </div>
+      <span class="exp-tag">SaaS</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="proj-header">
+    <div>
+      <div class="section-label reveal">Selected Work</div>
+      <h2 class="proj-title reveal">Projects that<br>define me.</h2>
+    </div>
+  </div>
+  <div class="proj-grid">
+    <div class="proj-card large reveal">
+      <div class="proj-card-bg"></div>
+      <div class="proj-card-num">01</div>
+      <div class="proj-card-accent"></div>
+      <div class="proj-card-content">
+        <div class="proj-cat">Website Design · Recruitment</div>
+        <div class="proj-name">JB Recruitment Solutions</div>
+        <div class="proj-desc">End-to-end recruitment website focused on trust, clarity, and conversion. Structured IA for services, hiring workflow, and industry coverage with responsive layouts and strong visual hierarchy.</div>
+        <div class="proj-tags">
+          <span>UX Design</span><span>Web</span><span>Information Architecture</span><span>Responsive</span>
+        </div>
+        <a href="#" class="proj-link">View Case Study →</a>
+      </div>
+    </div>
+    <div class="proj-card reveal" style="transition-delay:0.1s">
+      <div class="proj-card-bg"></div>
+      <div class="proj-card-num">02</div>
+      <div class="proj-card-accent"></div>
+      <div class="proj-card-content">
+        <div class="proj-cat">Mobile App · Corporate</div>
+        <div class="proj-name">Corporate Ride Sharing</div>
+        <div class="proj-desc">Secure corporate carpooling UX with SSO and OTP-based auth, proximity-based ride matching, wallet payments, live tracking, and SOS features.</div>
+        <div class="proj-tags">
+          <span>Mobile UX</span><span>Safety</span><span>Figma</span>
+        </div>
+        <a href="#" class="proj-link">View on Behance →</a>
+      </div>
+    </div>
+    <div class="proj-card reveal" style="transition-delay:0.2s">
+      <div class="proj-card-bg"></div>
+      <div class="proj-card-num">03</div>
+      <div class="proj-card-accent"></div>
+      <div class="proj-card-content">
+        <div class="proj-cat">Mobile App · Productivity</div>
+        <div class="proj-name">FocusMate</div>
+        <div class="proj-desc">Productivity app with clean, minimal design aesthetic. Task creation, completion, and organization using Pomodoro principles with priority levels and smart categorization.</div>
+        <div class="proj-tags">
+          <span>App Design</span><span>Productivity</span><span>Minimal</span>
+        </div>
+        <a href="#" class="proj-link">View on Behance →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-pre">Let's create something great</p>
+  <h2 class="contact-title">Let's<br>Talk.</h2>
+  <a href="mailto:amanvarma@example.com" class="contact-email">amanvarma@example.com</a>
+  <div class="contact-links">
+    <a href="https://www.linkedin.com/in/amanvarma-vitrouthu" target="_blank" class="contact-link">LinkedIn</a>
+    <a href="https://www.behance.net/" target="_blank" class="contact-link">Behance</a>
+    <a href="tel:+916309390156" class="contact-link">+91 6309390156</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Aman Varma</div>
+  <div class="footer-copy">© 2025 · UI/UX Designer · Hyderabad, India</div>
+</footer>
+
+<script>
+  // ─── HIDE CURSOR ON TOUCH DEVICES
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    document.getElementById('cursor').style.display = 'none';
+    document.getElementById('cursor-follower').style.display = 'none';
+    document.body.style.cursor = 'auto';
+  }
+
+  // ─── CUSTOM CURSOR (desktop only)
+  const cursor = document.getElementById('cursor');
+  const follower = document.getElementById('cursor-follower');
+  let mx = 0, my = 0, fx = 0, fy = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    fx += (mx - fx) * 0.1; fy += (my - fy) * 0.1;
+    follower.style.left = fx + 'px'; follower.style.top = fy + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // ─── LOADER
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      loader.classList.add('out');
+      setTimeout(() => loader.remove(), 800);
+    }, 2000);
+  });
+
+  // ─── SCROLL REVEAL
+  const reveals = document.querySelectorAll('.reveal, .reveal-left');
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  reveals.forEach(el => revealObserver.observe(el));
+
+  // ─── AVATAR CURSOR PARALLAX
+  // Smooth lerp — premium, unhurried motion
+  const avatarWrap = document.getElementById('hero-avatar-wrap');
+  let aX = 0, aY = 0, tAX = 0, tAY = 0;
+
+  document.addEventListener('mousemove', e => {
+    const w = window.innerWidth, h = window.innerHeight;
+    // -1 → +1 normalized, centered
+    const nx = (e.clientX / w - 0.5) * 2;
+    const ny = (e.clientY / h - 0.5) * 2;
+    // Max ±16px horizontal, ±11px vertical — subtle & premium
+    tAX = nx * 16;
+    tAY = ny * 11;
+  });
+
+  function rafAvatar() {
+    // lerp factor 0.05 = very slow/smooth follow
+    aX += (tAX - aX) * 0.05;
+    aY += (tAY - aY) * 0.05;
+    if (avatarWrap) {
+      // Combine parallax with the CSS float animation via translateZ trick
+      // We only drive X/Y here; CSS handles the Y float independently via SVG
+      avatarWrap.style.transform = `translate(${aX}px, ${aY}px)`;
+    }
+    requestAnimationFrame(rafAvatar);
+  }
+  rafAvatar();
+
+  // ─── MAGNETIC BUTTONS
+  document.querySelectorAll('.btn-primary, .btn-outline').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+      btn.style.transition = 'none';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate(0, 0)';
+      btn.style.transition = 'transform 0.5s cubic-bezier(.76,0,.24,1)';
+    });
+  });
+
+  // ─── NAV HIDE ON SCROLL
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    const scrollY = window.scrollY;
+    if (scrollY > lastScroll && scrollY > 100) {
+      nav.style.transform = 'translateX(-50%) translateY(-100%)';
+      nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
+    } else {
+      nav.style.transform = 'translateX(-50%) translateY(0)';
+      nav.style.transition = 'transform 0.4s cubic-bezier(.76,0,.24,1)';
+    }
+    lastScroll = scrollY;
+  });
+</script>
+</body>
+</html>
