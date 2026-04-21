@@ -488,35 +488,81 @@
   /* ─── ABOUT ─── */
   #about {
     padding: 140px 48px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    text-align: center;
+    background: var(--bg);
   }
-  .about-left {}
-  .section-label {
-    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+  .about-headline {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    margin-bottom: 24px;
   }
-  .section-label::before { content: ''; width: 40px; height: 1px; background: var(--accent); }
-  .about-title {
-    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 32px;
+  .about-supporting {
+    font-size: 1.1rem;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-bottom: 80px;
   }
-  .about-title em { font-style: italic; color: var(--accent); }
-  .about-body { font-size: 1.05rem; color: var(--mid); line-height: 1.9; }
-  .about-right { display: flex; flex-direction: column; gap: 32px; }
-  .about-card {
-    background: #111; border: 1px solid var(--muted);
-    padding: 28px; position: relative; overflow: hidden;
-    transition: border-color 0.3s, transform 0.4s;
+  .about-stories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-bottom: 80px;
   }
-  .about-card::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0;
-    background: var(--accent); transition: height 0.4s cubic-bezier(.76,0,.24,1);
+  .story-block {
+    display: flex;
+    flex-direction: column;
+    background: #111;
+    border: 1px solid var(--muted);
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(.76,0,.24,1), border-color 0.3s, box-shadow 0.3s;
+    cursor: none;
   }
-  .about-card:hover { border-color: var(--accent); transform: translateX(6px); }
-  .about-card:hover::before { height: 100%; }
-  .about-card-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; color: var(--accent); opacity: 0.2; line-height: 1; margin-bottom: 4px; }
-  .about-card-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-  .about-card-text { font-size: 0.9rem; color: var(--mid); line-height: 1.7; }
+  .story-block:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent);
+    box-shadow: 0 20px 40px rgba(200,240,77,0.1);
+  }
+  .story-image {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+  }
+  .story-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(.76,0,.24,1);
+  }
+  .story-block:hover .story-image img {
+    transform: scale(1.05);
+  }
+  .story-content {
+    padding: 32px 24px;
+  }
+  .story-content h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 12px;
+  }
+  .story-content p {
+    font-size: 0.95rem;
+    color: var(--mid);
+    line-height: 1.6;
+  }
+  .about-footer {
+    font-size: 1rem;
+    color: var(--fg);
+    font-weight: 500;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
 
   /* ─── SKILLS ─── */
   #skills { padding: 100px 48px; background: #0d0d0d; }
@@ -707,7 +753,8 @@
     .avatar-badge { left: 0; bottom: 44px; }
     .avatar-chip  { right: 4px; top: 56px; }
 
-    #about { padding: 100px 36px; gap: 48px; }
+    #about { padding: 100px 36px; }
+    .about-stories { grid-template-columns: repeat(2, 1fr); gap: 32px; }
     #skills, #projects { padding: 80px 36px; }
     .skills-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 48px; }
     .skills-grid { grid-template-columns: repeat(2, 1fr); }
@@ -857,13 +904,14 @@
     .hero-scroll { display: none; }
 
     /* ── ABOUT ── */
-    #about {
-      grid-template-columns: 1fr;
-      padding: 72px 20px;
-      gap: 48px;
-    }
-    .about-title { font-size: clamp(1.8rem, 7vw, 2.5rem); }
-    .about-body  { font-size: 0.95rem; }
+    #about { padding: 72px 20px; }
+    .about-headline { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+    .about-supporting { font-size: 1rem; margin-bottom: 48px; }
+    .about-stories { grid-template-columns: 1fr; gap: 24px; margin-bottom: 48px; }
+    .story-block { max-width: 100%; }
+    .story-image { height: 200px; }
+    .story-content { padding: 24px 20px; }
+    .about-footer { font-size: 0.9rem; }
 
     /* ── SKILLS ── */
     #skills { padding: 72px 20px; }
@@ -1508,28 +1556,38 @@
 
 <!-- ABOUT -->
 <section id="about">
-  <div class="about-left reveal-left">
-    <div class="section-label">About Me</div>
-    <h2 class="about-title">I design with <em>purpose</em> and precision.</h2>
-    <p class="about-body">Hi, I'm Aman — a UI/UX Designer based in Hyderabad, India. With a background in Computer Science (AI & ML), I blend analytical thinking with a sharp design sensibility to create products people love using. I've shipped production-ready interfaces for startups across productivity, sports, e-commerce, and enterprise.</p>
+  <h2 class="about-headline">I don’t just design screens<br>I design how people understand products</h2>
+  <p class="about-supporting">From confusion → clarity<br>From ideas → usable experiences</p>
+  <div class="about-stories">
+    <div class="story-block reveal" style="transition-delay:0.1s">
+      <div class="story-image">
+        <img src="https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Fashion+UI+Mockup" alt="Fashion UI Mockup" loading="lazy">
+      </div>
+      <div class="story-content">
+        <h3>Products Designed</h3>
+        <p>Real-world solutions built for actual users</p>
+      </div>
+    </div>
+    <div class="story-block reveal" style="transition-delay:0.2s">
+      <div class="story-image">
+        <img src="https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Wireframe+Flow" alt="Wireframe Flow" loading="lazy">
+      </div>
+      <div class="story-content">
+        <h3>End-to-End UX Thinking</h3>
+        <p>From research → wireframes → final UI</p>
+      </div>
+    </div>
+    <div class="story-block reveal" style="transition-delay:0.3s">
+      <div class="story-image">
+        <img src="https://via.placeholder.com/400x300/1a1a1a/ffffff?text=Design+System" alt="Design System Components" loading="lazy">
+      </div>
+      <div class="story-content">
+        <h3>Design Systems Thinking</h3>
+        <p>Built for consistency, scalability, and clarity</p>
+      </div>
+    </div>
   </div>
-  <div class="about-right">
-    <div class="about-card reveal" style="transition-delay:0.1s">
-      <div class="about-card-num">01</div>
-      <div class="about-card-title">Figma Design Systems</div>
-      <div class="about-card-text">Built 3 scalable design systems with 80+ reusable components, reducing dev handoff time by 40%.</div>
-    </div>
-    <div class="about-card reveal" style="transition-delay:0.2s">
-      <div class="about-card-num">02</div>
-      <div class="about-card-title">User-Centered Approach</div>
-      <div class="about-card-text">Improved checkout task success by 25% and reduced navigation friction by 30% through research-backed UX.</div>
-    </div>
-    <div class="about-card reveal" style="transition-delay:0.3s">
-      <div class="about-card-num">03</div>
-      <div class="about-card-title">Full Product Delivery</div>
-      <div class="about-card-text">From wireframes to production. Collaborated with founders and engineers to ship 4+ end-to-end products.</div>
-    </div>
-  </div>
+  <p class="about-footer">Every number here represents a problem I solved — not just a screen I designed.</p>
 </section>
 
 <!-- SKILLS -->
@@ -1671,6 +1729,34 @@
           <span>Web Design</span><span>Productivity</span><span>Minimal</span>
         </div>
         <a href="https://www.behance.net/gallery/230565385/To-Do-list-UI" class="proj-link">View on Behance →</a>
+      </div>
+    </div>
+    <div class="proj-card reveal" style="transition-delay:0.3s">
+      <div class="proj-card-bg"></div>
+      <div class="proj-card-num">04</div>
+      <div class="proj-card-accent"></div>
+      <div class="proj-card-content">
+        <div class="proj-cat">E-commerce · Fashion</div>
+        <div class="proj-name">Wear It Wrong</div>
+        <div class="proj-desc">Fashion e-commerce platform with modern design, featuring brand showcases, user stories, and space inspirations. Clean, engaging UI for shopping experience.</div>
+        <div class="proj-tags">
+          <span>Web Design</span><span>E-commerce</span><span>Branding</span>
+        </div>
+        <a href="https://wearitwrong.in/" class="proj-link">View Project →</a>
+      </div>
+    </div>
+    <div class="proj-card reveal" style="transition-delay:0.4s">
+      <div class="proj-card-bg"></div>
+      <div class="proj-card-num">05</div>
+      <div class="proj-card-accent"></div>
+      <div class="proj-card-content">
+        <div class="proj-cat">Business · Expansion Services</div>
+        <div class="proj-name">Virtual Partner UAE</div>
+        <div class="proj-desc">Professional website for UAE market expansion services. Clear messaging, service breakdowns, testimonials, and lead generation forms for global businesses.</div>
+        <div class="proj-tags">
+          <span>Web Design</span><span>B2B</span><span>Lead Generation</span>
+        </div>
+        <a href="https://www.virtualpartneruae.com/" class="proj-link">View Project →</a>
       </div>
     </div>
   </div>
